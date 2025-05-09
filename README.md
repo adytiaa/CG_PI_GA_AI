@@ -8,7 +8,6 @@ A modular framework implementing Physics-Informed Neural Networks (PINNs) with G
 - **Gradient Normalization**: Improved training stability using advanced gradient normalization techniques
 - **Multiple PDE Support**:
   - Heat Equation (1D)
-  - Schrödinger Equation (1D)
   - Korteweg-de Vries (KdV) Equation
   - Navier-Stokes Equations for Crystal Growth (2D)
 - **Neural Network Options**:

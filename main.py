@@ -7,7 +7,7 @@ import sys
 import numpy as np
 
 from models import MLP, SIREN, PINN, GNPINN
-from equations import Heat1D, Schrodinger1D, KdV, NavierStokes2D
+from equations import Heat1D, KdV, NavierStokes2D
 from utils import set_seed, count_parameters, save_model, load_model
 from visualization import plot_loss_history, plot_solution_1d
 
@@ -100,27 +100,27 @@ def run_heat_equation(args):
         except Exception as e2:
             print(f"Could not create simplified plot: {e2}")
 
-
-def run_schrodinger_equation(args):
+def run_thermal_copling(args):
     """
-    Run Schrödinger equation experiment
+    Run thermal-fluid coupling simulation for silicon melt
     """
-    print("\n=== Schrödinger Equation Experiment ===")
+    print("\n=== Thermal-Fluid Coupling Simulation ===")
     
     # Define domain
     domain_ranges = {
-        'x': (-5, 5),  # Spatial domain: x ∈ [-5, 5]
-        't': (0, 1),   # Time domain: t ∈ [0, 1]
+        'x': (-5, 5),   # Spatial domain: x ∈ [-5, 5]
+        'y': (-5, 5),   # Spatial domain: y ∈ [-5, 5]
+        't': (0, 1),    # Time domain: t ∈ [0, 1]
     }
     
     # Create PDE instance
-    schrodinger_eq = Schrodinger1D(domain_ranges=domain_ranges, device=args.device)
+    thermal_fluid_eq = NavierStokesEnergy(domain_ranges=domain_ranges, device=args.device)
     
     # Create neural network
     if args.network_type == 'mlp':
-        model = MLP(2, 2, args.hidden_layers, args.neurons, activation=args.activation)
+        model = MLP(3, 4, args.hidden_layers, args.neurons, activation=args.activation)  # 3 inputs (x, y, t), 4 outputs (u, v, p, T)
     elif args.network_type == 'siren':
-        model = SIREN(2, 2, args.hidden_layers, args.neurons)
+        model = SIREN(3, 4, args.hidden_layers, args.neurons)
     else:
         raise ValueError(f"Unknown network type: {args.network_type}")
     
@@ -128,10 +128,13 @@ def run_schrodinger_equation(args):
     
     # Create PINN
     if args.use_gn:
-        pinn = GNPINN(model, schrodinger_eq, args.device)
+        pinn = GNPINN(model, thermal_fluid_eq, args.device)
         print("Using Gradient-Normalized PINN")
+    elif args.use_rf:
+        pinn = rf-pinn(model, thermal_fluid_eq, args.device)
+        print("Using reactive flow PINN")
     else:
-        pinn = PINN(model, schrodinger_eq, args.device)
+        pinn = PINN(model, thermal_fluid_eq, args.device)
         print("Using standard PINN")
     
     # Optimizer
@@ -149,9 +152,9 @@ def run_schrodinger_equation(args):
     
     # Save model
     if args.save_model:
-        save_path = os.path.join(args.output_dir, "schrodinger_model.pt")
+        save_path = os.path.join(args.output_dir, "thermal_fluid_model.pt")
         metadata = {
-            'equation': 'schrodinger',
+            'equation': 'navier-stokes-energy',
             'args': vars(args),
             'final_losses': {k: v[-1] for k, v in history.items()}
         }
@@ -162,79 +165,51 @@ def run_schrodinger_equation(args):
     try:
         # Plot loss history
         plot_loss_history(history)
-        plt.savefig(os.path.join(args.output_dir, "schrodinger_loss.png"))
+        plt.savefig(os.path.join(args.output_dir, "thermal_fluid_loss.png"))
         
-        # Plot wave function evolution
-        def plot_wavefunction(n_points=100, n_times=5):
-            x_min, x_max = schrodinger_eq.domain_ranges['x']
-            t_min, t_max = schrodinger_eq.domain_ranges['t']
+        # Plot velocity and temperature fields
+        def plot_fluid_fields(n_points=100, n_times=5):
+            x_min, x_max = domain_ranges['x']
+            y_min, y_max = domain_ranges['y']
+            t_min, t_max = domain_ranges['t']
             
-            # Create spatial grid
             x = torch.linspace(x_min, x_max, n_points, device=args.device)
-            
-            # Create time points
+            y = torch.linspace(y_min, y_max, n_points, device=args.device)
             times = torch.linspace(t_min, t_max, n_times, device=args.device)
+            
+            X, Y = torch.meshgrid(x, y, indexing='xy')
+            points = torch.stack([X.flatten(), Y.flatten()], dim=1)
             
             plt.figure(figsize=(12, 10))
             
             for i, t_value in enumerate(times):
-                # Create time tensor
-                t_tensor = torch.ones_like(x, device=args.device) * t_value
+                t_tensor = torch.full((points.shape[0], 1), t_value, device=args.device)
+                input_points = torch.cat([points, t_tensor], dim=1)
                 
-                # Create input points
-                points = torch.stack([x, t_tensor], dim=1)
-                
-                # Evaluate model
                 model.eval()
                 with torch.no_grad():
-                    psi = model(points)
-                    try:
-                        psi_real = psi[:, 0].cpu().numpy()
-                        psi_imag = psi[:, 1].cpu().numpy()
-                    except RuntimeError:
-                        psi_real = psi[:, 0].cpu()
-                        psi_imag = psi[:, 1].cpu()
-                    
-                    # Calculate probability density |ψ|^2
-                    prob_density = psi_real**2 + psi_imag**2
+                    output = model(input_points)
+                    u, v, T = output[:, 0], output[:, 1], output[:, 3]
                 
-                # Plot probability density
                 plt.subplot(n_times, 1, i+1)
-                try:
-                    plt.plot(x.cpu().numpy(), prob_density)
-                except RuntimeError:
-                    # If numpy conversion fails, use native PyTorch plotting
-                    plt.plot(x.cpu().tolist(), prob_density.tolist() if isinstance(prob_density, torch.Tensor) else prob_density)
-                plt.title(f'Probability Density at t = {t_value.item():.2f}')
+                plt.quiver(X.cpu(), Y.cpu(), u.cpu().reshape(n_points, n_points), v.cpu().reshape(n_points, n_points))
+                plt.title(f'Velocity Field at t = {t_value.item():.2f}')
                 plt.xlabel('x')
-                plt.ylabel('|ψ|²')
+                plt.ylabel('y')
                 plt.grid(True)
             
             plt.tight_layout()
         
         print("Plotting solution...")
-        plot_wavefunction()
-        plt.savefig(os.path.join(args.output_dir, "schrodinger_evolution.png"))
+        plot_fluid_fields()
+        plt.savefig(os.path.join(args.output_dir, "thermal_fluid_evolution.png"))
         
         if args.show_plots:
             plt.show()
     except Exception as e:
         print(f"Warning: Error during plotting: {e}")
         print("Plotting failed, but model training was successful.")
-        
-        # Try simpler plot for loss history
-        try:
-            plt.figure(figsize=(10, 6))
-            plt.semilogy(history['total_loss'], label='Total Loss')
-            plt.grid(True)
-            plt.xlabel('Epoch')
-            plt.ylabel('Loss')
-            plt.title('Training Loss')
-            plt.legend()
-            plt.savefig(os.path.join(args.output_dir, "schrodinger_loss_simple.png"))
-            print("Created simplified loss plot.")
-        except Exception as e2:
-            print(f"Could not create simplified plot: {e2}")
+
 
 
 def run_kdv_equation(args):
@@ -780,12 +755,14 @@ def main():
     # Run selected experiment
     if args.equation == 'heat':
         run_heat_equation(args)
-    elif args.equation == 'schrodinger':
-        run_schrodinger_equation(args)
+    elif args.equation == 'thermal_copling':
+        run_thermal_copling(args)
     elif args.equation == 'kdv':
         run_kdv_equation(args)
     elif args.equation == 'crystal':
         run_crystal_growth(args)
+    elif args.equation == 'crystal_new':
+        run_crystal_growth_new(args)    
     else:
         raise ValueError(f"Unknown equation: {args.equation}")
 
