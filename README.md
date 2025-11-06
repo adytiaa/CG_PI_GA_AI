@@ -1,18 +1,19 @@
-# GS-PINN: Gradient-Normalized Physics-Informed Neural Networks
+# Physics-Based AI modes for acceerating and increasing the Efficiency of CFD for Silicon Single Crystal Growth Simulations
 
-A modular framework implementing Physics-Informed Neural Networks (PINNs) with Gradient Normalization for solving differential equations including Navier-Stokes equations for crystal growth modeling.
+
+A modular framework implementing variants of Physics-Informed Neural Networks (PINNs) for thermal-fluid coupling which includes Navier-Stokes equations CFD for crystal growth simulations.
 
 ## Features
 
 - **Modular Design**: Easily extendable framework for PINNs with clean separation of concerns
 - **Gradient Normalization**: Improved training stability using advanced gradient normalization techniques
 - **Multiple PDE Support**:
-  - Heat Equation (1D)
-  - Korteweg-de Vries (KdV) Equation
   - Navier-Stokes Equations for Crystal Growth (2D)
+  - Navier-Stokes Equations for Crystal Growth (3D)
 - **Neural Network Options**:
-  - MLP (Multi-Layer Perceptron)
-  - SIREN (Sinusoidal Representation Networks)
+  - PINN 
+  - PI-GANO
+  - GAOT
 - **Visualization Tools**: Comprehensive plotting utilities for solution visualization
 
 ## Requirements
@@ -28,8 +29,8 @@ A modular framework implementing Physics-Informed Neural Networks (PINNs) with G
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gs-pinn.git
-cd gs-pinn
+git clone https://github.com/yourusername/pinns_cg_cfd
+cd pinns_cg_cfd
 
 # Create a virtual environment (optional but recommended)
 python -m venv venv
@@ -141,11 +142,9 @@ gs-pinn/
 
 ## Future Work
 
-- Add support for higher-dimensional problems
-- Implement adaptive sampling strategies
+- Add support for higher-dimensional and Thermal Coupling Equations
 - Add more visualization options
 - Extend crystal growth modeling capabilities
-- Add quantum state extensions for the Schrödinger equation
 - Implement Allen-Cahn equation
 - Implement 3D Navier-Stokes equations
 
@@ -161,8 +160,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 # Crystal Growth Simulation
 
-This project simulates crystal growth using the Navier-Stokes equations and Physics-Informed Neural Networks (PINNs).
-
+This project simulates crystal growth using the Navier-Stokes, thermal coupling, and variants of Physics-Informed Geometry Aware AI mode
 ## Setup
 
 The project uses a virtual environment named "gradient" for dependency management.
