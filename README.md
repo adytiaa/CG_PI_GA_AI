@@ -10,9 +10,9 @@ A modular framework implementing variants of Physics-Informed Neural Networks (P
 - **Multiple PDE Support**:
   - Navier-Stokes Equations for Crystal Growth (2D)
   - Navier-Stokes Equations for Crystal Growth (3D)
-- **Neural Network Options**:
-  - PINN 
-  - PI-GANO
+- **Neural Network **:
+  - Physics-Inspired NNs
+  - PI-GANO (GEOMETRY AWARE)
   - GAOT
 - **Visualization Tools**: Comprehensive plotting utilities for solution visualization
 
@@ -29,8 +29,8 @@ A modular framework implementing variants of Physics-Informed Neural Networks (P
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pinns_cg_cfd
-cd pinns_cg_cfd
+git clone repo url
+cd dir/
 
 # Create a virtual environment (optional but recommended)
 python -m venv venv
@@ -225,4 +225,4 @@ Options:
 
 ## Visualization
 
-The simulation creates both individual frames and an HTML slideshow for viewing the results. Open the slideshow in a web browser to see the animation with playback controls. 
+The simulation creates both individual frames and an HTML slideshow for viewing the results. Open the slideshow in a web browser to see the animation with playback controls
