@@ -355,7 +355,7 @@ def run_crystal_growth(args):
     # Set the device
     device = torch.device(args.device)
 
-    # Define domain for crystal growth problem
+    # Define domain for crystal growth simulations
     domain = {
         'x': (0, 1),     # Horizontal dimension of the domain
         'y': (0, 1),     # Vertical dimension of the domain

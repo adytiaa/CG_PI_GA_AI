@@ -68,20 +68,6 @@ For Navier-Stokes crystal growth simulation:
 
 ### Examples
 
-#### Solving the Heat Equation
-```bash
-python main.py --equation heat --use_gn --network_type siren --hidden_layers 4 --neurons 50 --epochs 5000
-```
-
-#### Solving the Schrödinger Equation
-```bash
-python main.py --equation schrodinger --use_gn --network_type siren --hidden_layers 5 --neurons 100 --epochs 8000
-```
-
-#### Solving the KdV Equation
-```bash
-python main.py --equation kdv --use_gn --network_type siren --hidden_layers 5 --neurons 100 --epochs 10000
-```
 
 #### Crystal Growth Simulation using Navier-Stokes
 ```bash
@@ -90,67 +76,15 @@ python main.py --equation crystal --use_gn --network_type siren --hidden_layers 
 
 ## Project Structure
 
-```
-gs-pinn/
-├── core/                # Core components
-├── models/              # Neural network models
-│   ├── __init__.py
-│   ├── mlp.py           # Multi-layer perceptron model
-│   ├── siren.py         # SIREN model
-│   └── pinn.py          # PINN and GNPINN implementations
-├── equations/           # Equation implementations
-│   ├── __init__.py
-│   ├── base.py          # Base PDE class
-│   ├── heat.py          # Heat equation
-│   ├── schrodinger.py   # Schrödinger equation
-│   ├── kdv.py           # KdV equation
-│   └── navier_stokes.py # Navier-Stokes equations for crystal growth
-├── utils/               # Utility functions
-│   ├── __init__.py
-│   └── helpers.py       # Helper functions
-├── visualization/       # Visualization tools
-│   ├── __init__.py
-│   └── plotting.py      # Plotting utilities
-├── examples/            # Example scripts
-│   ├── __init__.py
-│   ├── heat_equation.py     # Heat equation example
-│   ├── schrodinger.py       # Schrödinger equation example
-│   ├── kdv_equation.py      # KdV equation example
-│   └── crystal_growth.py    # Crystal growth example using Navier-Stokes
-├── main.py              # Main script
-├── requirements.txt     # Dependencies
-└── README.md            # This file
-```
 
-## Extending the Framework
-
-### Adding a New PDE
-
-1. Create a new file in the `equations` directory
-2. Implement a class that inherits from `PDEBase`
-3. Implement the required methods:
-   - `compute_residual`
-   - `get_boundary_conditions`
-   - `get_initial_conditions`
-4. Update `equations/__init__.py` to include your new PDE
-
-### Adding a New Neural Network Architecture
-
-1. Create a new file in the `models` directory
-2. Implement a class that inherits from `torch.nn.Module`
-3. Update `models/__init__.py` to include your new model
 
 ## Future Work
 
 - Add support for higher-dimensional and Thermal Coupling Equations
 - Add more visualization options
 - Extend crystal growth modeling capabilities
-- Implement Allen-Cahn equation
 - Implement 3D Navier-Stokes equations
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
@@ -226,3 +160,7 @@ Options:
 ## Visualization
 
 The simulation creates both individual frames and an HTML slideshow for viewing the results. Open the slideshow in a web browser to see the animation with playback controls
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
