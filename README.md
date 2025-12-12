@@ -95,8 +95,8 @@ python main.py --equation crystal --use_gn --network_type siren --hidden_layers 
 # Crystal Growth Simulation
 
 This project simulates crystal growth using the Navier-Stokes, thermal coupling, and variants of Physics-Informed Geometry Aware AI mode
-## Setup
 
+## Setup
 The project uses a virtual environment named "gradient" for dependency management.
 
 ### Activating the Virtual Environment
@@ -114,7 +114,7 @@ gradient\Scripts\activate
 After activating the virtual environment, ensure you have the following dependencies:
 
 ```bash
-pip install numpy matplotlib torch
+pip install requirments.txt
 ```
 
 ## Running the Simulation
