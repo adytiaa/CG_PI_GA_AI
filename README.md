@@ -1,4 +1,4 @@
-# Physics-Based AI modes for acceerating and increasing the Efficiency of CFD for Silicon Single Crystal Growth Simulations
+# Physics-Based AI modes for accelerating and increasing the Efficiency of CFD Simulations for Silicon Single Crystal Growth
 
 
 A modular framework implementing variants of Physics-Informed Neural Networks (PINNs) for thermal-fluid coupling which includes Navier-Stokes equations CFD for crystal growth simulations.
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 The framework can be used through the command line interface:
 
 ```bash
-python main.py --equation [heat|schrodinger|kdv|crystal] [options]
+python main.py --equation
 ```
 
 ### Command Line Arguments
@@ -74,9 +74,6 @@ For Navier-Stokes crystal growth simulation:
 python main.py --equation crystal --use_gn --network_type siren --hidden_layers 5 --neurons 100 --viscosity 0.01 --thermal_diffusivity 0.005 --epochs 5000
 ```
 
-## Project Structure
-
-
 
 ## Future Work
 
@@ -94,32 +91,10 @@ python main.py --equation crystal --use_gn --network_type siren --hidden_layers 
 
 # Crystal Growth Simulation
 
-This project simulates crystal growth using the Navier-Stokes, thermal coupling, and variants of Physics-Informed Geometry Aware AI mode
+This project simulates crystal growth using the Navier-Stokes, thermal coupling, and variants of Physics-Informed Geometry Aware AI models
 
-## Setup
-The project uses a virtual environment named "gradient" for dependency management.
 
-### Activating the Virtual Environment
-
-```bash
-# On macOS/Linux
-source gradient/bin/activate
-
-# On Windows
-gradient\Scripts\activate
-```
-
-### Required Dependencies
-
-After activating the virtual environment, ensure you have the following dependencies:
-
-```bash
-pip install requirments.txt
-```
-
-## Running the Simulation
-
-### Simple Animation
+### Visualisation
 
 To generate a series of frames showing the crystal growth:
 
@@ -132,14 +107,6 @@ Options:
 - `--output-dir`: Custom directory to save frames (optional)
 
 After running the script, the frames will be saved in `results/simple_animation/frames/` and an HTML slideshow will be created at `results/simple_animation/slideshow.html`.
-
-### Advanced Simulation with PINNs
-
-For the full physics-informed neural network simulation:
-
-```bash
-python examples/crystal_growth_video.py
-```
 
 Options:
 - `--frames`: Number of frames in the video
@@ -157,7 +124,6 @@ Options:
   - `simple_animation.py`: Creates frame-by-frame animation
   - `crystal_growth_video.py`: Full PINN-based simulation
 
-## Visualization
 
 The simulation creates both individual frames and an HTML slideshow for viewing the results. Open the slideshow in a web browser to see the animation with playback controls
 

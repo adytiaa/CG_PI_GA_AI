@@ -1,0 +1,510 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{geometry}
+\usepackage{physics}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+\title{Improved Physics-Informed Neural Network for Thermal--Fluid Coupling in Czochralski Silicon Crystal Growth}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+This document summarizes the governing equations, modeling assumptions, training methodology,
+and mathematical structure of the \emph{improved physics-informed neural network (PINN)}
+proposed in:
+
+\begin{quote}
+Research on the thermal--fluid coupling in the growth process of Czochralski silicon single crystals
+based on an improved physics-informed neural network,\\
+\emph{AIP Advances}, 15, 105202 (2025).
+\end{quote}
+
+The model targets steady, incompressible, thermally driven melt flow during Czochralski (CZ)
+silicon crystal growth and introduces spatial-information enhancement and adaptive loss balancing.
+
+\section{Governing Equations}
+
+The melt is modeled as a steady, incompressible Newtonian fluid under the Boussinesq approximation.
+A two-dimensional axisymmetric domain is assumed.
+
+\subsection{Continuity Equation}
+
+\begin{equation}
+\nabla \cdot \bm{u} = 0
+\end{equation}
+
+In Cartesian form (as used in the paper's 2D numerical implementation):
+\begin{equation}
+\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0
+\end{equation}
+
+\subsection{Momentum Equations}
+
+The steady incompressible Navier--Stokes equations with buoyancy coupling are given by
+\begin{equation}
+\rho (\bm{u} \cdot \nabla)\bm{u}
+= -\nabla p + \mu \nabla^2 \bm{u}
++ \rho \bm{g}\beta (T - T_0).
+\end{equation}
+
+Component-wise:
+\begin{align}
+u \frac{\partial u}{\partial x} + v \frac{\partial u}{\partial y}
+&= -\frac{1}{\rho} \frac{\partial p}{\partial x}
++ \nu \left( \frac{\partial^2 u}{\partial x^2}
++ \frac{\partial^2 u}{\partial y^2} \right), \\
+u \frac{\partial v}{\partial x} + v \frac{\partial v}{\partial y}
+&= -\frac{1}{\rho} \frac{\partial p}{\partial y}
++ \nu \left( \frac{\partial^2 v}{\partial x^2}
++ \frac{\partial^2 v}{\partial y^2} \right)
++ g\beta(T - T_0).
+\end{align}
+
+\subsection{Energy Equation}
+
+\begin{equation}
+\rho c_p (\bm{u} \cdot \nabla T)
+= k \nabla^2 T
+\end{equation}
+
+or equivalently,
+\begin{equation}
+u \frac{\partial T}{\partial x} + v \frac{\partial T}{\partial y}
+= \alpha \left(
+\frac{\partial^2 T}{\partial x^2}
++ \frac{\partial^2 T}{\partial y^2}
+\right),
+\end{equation}
+where $\alpha = k / (\rho c_p)$.
+
+\section{Modeling Assumptions}
+
+\begin{itemize}
+\item \textbf{Incompressibility}: density is constant except in the buoyancy term.
+\item \textbf{Boussinesq approximation}: thermal expansion drives buoyancy.
+\item \textbf{Laminar flow}: turbulence is neglected.
+\item \textbf{Steady-state}: time derivatives are omitted.
+\item \textbf{Axisymmetry}: azimuthal velocity is neglected.
+\item \textbf{Constant properties}: $\nu$, $k$, $c_p$ are constant.
+\end{itemize}
+
+\section{Dimensionless Formulation}
+
+Let characteristic scales be:
+\[
+L, \quad U, \quad \Delta T.
+\]
+
+Define dimensionless variables:
+\begin{equation}
+x^* = \frac{x}{L}, \quad
+\bm{u}^* = \frac{\bm{u}}{U}, \quad
+T^* = \frac{T - T_0}{\Delta T}, \quad
+p^* = \frac{p}{\rho U^2}.
+\end{equation}
+
+The dimensionless equations become:
+
+\subsection{Continuity}
+\begin{equation}
+\nabla^* \cdot \bm{u}^* = 0
+\end{equation}
+
+\subsection{Momentum}
+\begin{equation}
+(\bm{u}^* \cdot \nabla^*) \bm{u}^*
+= -\nabla^* p^*
++ \frac{1}{\mathrm{Re}} \nabla^{*2} \bm{u}^*
++ \mathrm{Ra}\,\mathrm{Pr}^{-1} T^* \bm{e}_g
+\end{equation}
+
+\subsection{Energy}
+\begin{equation}
+(\bm{u}^* \cdot \nabla^*) T^*
+= \frac{1}{\mathrm{Re}\,\mathrm{Pr}} \nabla^{*2} T^*
+\end{equation}
+
+where
+\begin{align}
+\mathrm{Re} &= \frac{UL}{\nu}, \\
+\mathrm{Pr} &= \frac{\nu}{\alpha}, \\
+\mathrm{Ra} &= \frac{g\beta \Delta T L^3}{\nu \alpha}.
+\end{align}
+
+\section{PINN Approximation}
+
+The neural network approximates:
+\begin{equation}
+\mathcal{N}_\theta(x,y) \rightarrow \{u,v,p,T\}.
+\end{equation}
+
+Automatic differentiation is used to compute all spatial derivatives.
+
+\section{Improved PINN vs Standard PINN}
+
+\subsection{Standard PINN}
+
+A standard PINN minimizes:
+\begin{equation}
+\mathcal{L}_{\text{std}} =
+\sum_i \| \mathcal{R}_i \|^2
++ \sum_j \| \mathcal{B}_j \|^2,
+\end{equation}
+with fixed loss weights and spatial coordinates only entering at the input layer.
+
+\subsection{Improved PINN (SI--LB PINN)}
+
+The improved PINN introduces:
+
+\paragraph{Spatial Information Embedding}
+\begin{equation}
+h_\ell = \sigma\left(
+W_\ell h_{\ell-1}
++ Z_\ell \odot M(x,y)
++ (1-Z_\ell) \odot N(x,y)
+\right),
+\end{equation}
+which preserves geometric information in deep layers.
+
+\paragraph{Adaptive Loss Balancing}
+\begin{equation}
+\mathcal{L}
+= \sum_m \left(
+e^{-\log\sigma_m^2} \mathcal{L}_m + \log\sigma_m
+\right),
+\end{equation}
+where $\sigma_m$ are trainable parameters.
+
+This improves conditioning for multi-physics coupling.
+
+\section{Mapping Governing Equations to PyTorch Code}
+
+\subsection{Continuity Residual}
+\begin{verbatim}
+u_x = autograd.grad(u, x, grad_outputs=ones, create_graph=True)[0]
+v_y = autograd.grad(v, y, grad_outputs=ones, create_graph=True)[0]
+R_cont = u_x + v_y
+\end{verbatim}
+
+\subsection{Momentum Residual (x-direction)}
+\begin{verbatim}
+u_xx = autograd.grad(u_x, x, grad_outputs=ones, create_graph=True)[0]
+u_yy = autograd.grad(u_y, y, grad_outputs=ones, create_graph=True)[0]
+p_x  = autograd.grad(p, x, grad_outputs=ones, create_graph=True)[0]
+
+R_mom_x = u*u_x + v*u_y + p_x - nu*(u_xx + u_yy)
+\end{verbatim}
+
+\subsection{Momentum Residual (y-direction)}
+\begin{verbatim}
+p_y = autograd.grad(p, y, grad_outputs=ones, create_graph=True)[0]
+
+R_mom_y = u*v_x + v*v_y + p_y - nu*(v_xx + v_yy) - g*beta*(T-T0)
+\end{verbatim}
+
+\subsection{Energy Residual}
+\begin{verbatim}
+T_xx = autograd.grad(T_x, x, grad_outputs=ones, create_graph=True)[0]
+T_yy = autograd.grad(T_y, y, grad_outputs=ones, create_graph=True)[0]
+
+R_energy = u*T_x + v*T_y - alpha*(T_xx + T_yy)
+\end{verbatim}
+
+\section{Training Process}
+
+\begin{itemize}
+\item Collocation points sampled inside the domain
+\item Boundary condition points enforced via penalty loss
+\item Adam optimizer for training
+\item No labeled CFD or experimental data required
+\item COMSOL solutions used only for validation
+\end{itemize}
+
+\section{Axisymmetric Cylindrical Coordinate Formulation}
+
+The Czochralski crystal growth process is inherently axisymmetric.
+We therefore adopt cylindrical coordinates $(r,z,\theta)$ and assume
+$\partial / \partial \theta = 0$ and $u_\theta = 0$.
+
+The velocity field is:
+\[
+\bm{u} = (u_r(r,z),\, u_z(r,z))
+\]
+
+All governing equations include geometric source terms arising from the cylindrical coordinate system.
+
+---
+
+\subsection{Continuity Equation}
+
+The incompressible continuity equation in axisymmetric coordinates is:
+
+\begin{equation}
+\frac{1}{r}\frac{\partial}{\partial r}(r u_r)
++ \frac{\partial u_z}{\partial z}
+= 0
+\end{equation}
+
+This term is critical and is a common source of error in naïve PINN implementations.
+
+---
+
+\subsection{Momentum Equations}
+
+\subsubsection{Radial Momentum}
+
+\begin{equation}
+u_r \frac{\partial u_r}{\partial r}
++ u_z \frac{\partial u_r}{\partial z}
+=
+-\frac{1}{\rho} \frac{\partial p}{\partial r}
++ \nu
+\left(
+\frac{1}{r}\frac{\partial}{\partial r}
+\left(r \frac{\partial u_r}{\partial r}\right)
++ \frac{\partial^2 u_r}{\partial z^2}
+- \frac{u_r}{r^2}
+\right)
+\end{equation}
+
+---
+
+\subsubsection{Axial Momentum}
+
+\begin{equation}
+u_r \frac{\partial u_z}{\partial r}
++ u_z \frac{\partial u_z}{\partial z}
+=
+-\frac{1}{\rho} \frac{\partial p}{\partial z}
++ \nu
+\left(
+\frac{1}{r}\frac{\partial}{\partial r}
+\left(r \frac{\partial u_z}{\partial r}\right)
++ \frac{\partial^2 u_z}{\partial z^2}
+\right)
++ g\beta (T - T_0)
+\end{equation}
+
+---
+
+\subsection{Energy Equation}
+
+The heat transport equation in axisymmetric form is:
+
+\begin{equation}
+u_r \frac{\partial T}{\partial r}
++ u_z \frac{\partial T}{\partial z}
+=
+\alpha
+\left(
+\frac{1}{r}\frac{\partial}{\partial r}
+\left(r \frac{\partial T}{\partial r}\right)
++ \frac{\partial^2 T}{\partial z^2}
+\right)
+\end{equation}
+
+---
+
+\section{Dimensionless Axisymmetric Form}
+
+Using characteristic scales $(L, U, \Delta T)$:
+
+\[
+r^* = \frac{r}{L}, \quad
+z^* = \frac{z}{L}, \quad
+u^* = \frac{u}{U}, \quad
+T^* = \frac{T - T_0}{\Delta T}
+\]
+
+The dimensionless equations become:
+
+---
+
+\subsection{Continuity}
+
+\begin{equation}
+\frac{1}{r^*}\frac{\partial}{\partial r^*}
+(r^* u_r^*)
++ \frac{\partial u_z^*}{\partial z^*}
+= 0
+\end{equation}
+
+---
+
+\subsection{Momentum}
+
+\begin{align}
+u_r^* \partial_{r^*} u_r^*
++ u_z^* \partial_{z^*} u_r^*
+&=
+-\partial_{r^*} p^*
++ \frac{1}{\mathrm{Re}}
+\left(
+\frac{1}{r^*}\partial_{r^*}(r^* \partial_{r^*} u_r^*)
++ \partial_{z^*z^*} u_r^*
+- \frac{u_r^*}{r^{*2}}
+\right), \\
+u_r^* \partial_{r^*} u_z^*
++ u_z^* \partial_{z^*} u_z^*
+&=
+-\partial_{z^*} p^*
++ \frac{1}{\mathrm{Re}}
+\left(
+\frac{1}{r^*}\partial_{r^*}(r^* \partial_{r^*} u_z^*)
++ \partial_{z^*z^*} u_z^*
+\right)
++ \frac{\mathrm{Ra}}{\mathrm{Re}\,\mathrm{Pr}} T^*
+\end{align}
+
+---
+
+\subsection{Energy}
+
+\begin{equation}
+u_r^* \partial_{r^*} T^*
++ u_z^* \partial_{z^*} T^*
+=
+\frac{1}{\mathrm{Re}\,\mathrm{Pr}}
+\left(
+\frac{1}{r^*}\partial_{r^*}(r^* \partial_{r^*} T^*)
++ \partial_{z^*z^*} T^*
+\right)
+\end{equation}
+
+---
+
+\section{Weak Formulation (COMSOL-Consistent)}
+
+COMSOL solves the \textbf{weak (variational) form} of the governing equations.
+Let $v_r, v_z, q, w$ be admissible test functions.
+
+---
+
+\subsection{Continuity Weak Form}
+
+\begin{equation}
+\int_\Omega
+\left(
+\frac{1}{r}\frac{\partial}{\partial r}(r u_r)
++ \frac{\partial u_z}{\partial z}
+\right) q \, r\,dr\,dz
+= 0
+\end{equation}
+
+Note the \textbf{Jacobian factor $r$}, which is essential in axisymmetric COMSOL models.
+
+---
+
+\subsection{Radial Momentum Weak Form}
+
+\begin{align}
+\int_\Omega
+\left[
+(u_r \partial_r u_r + u_z \partial_z u_r)v_r
+- p \partial_r v_r
++ \nu (\nabla u_r \cdot \nabla v_r)
+- \nu \frac{u_r}{r^2} v_r
+\right]
+r \, dr\,dz
+= 0
+\end{align}
+
+---
+
+\subsection{Axial Momentum Weak Form}
+
+\begin{align}
+\int_\Omega
+\left[
+(u_r \partial_r u_z + u_z \partial_z u_z)v_z
+- p \partial_z v_z
++ \nu (\nabla u_z \cdot \nabla v_z)
++ g\beta (T - T_0) v_z
+\right]
+r \, dr\,dz
+= 0
+\end{align}
+
+---
+
+\subsection{Energy Weak Form}
+
+\begin{equation}
+\int_\Omega
+\left[
+(u_r \partial_r T + u_z \partial_z T) w
++ \alpha (\nabla T \cdot \nabla w)
+\right]
+r \, dr\,dz
+= 0
+\end{equation}
+
+---
+
+\section{PINN Residuals vs COMSOL Weak Residuals}
+
+\paragraph{Key Correspondence}
+
+\begin{itemize}
+\item \textbf{PINN}: Enforces \emph{strong-form residuals} at collocation points
+\item \textbf{COMSOL}: Enforces \emph{weak-form residuals} over finite elements
+\end{itemize}
+
+Mathematically:
+\[
+\mathcal{R}_{\text{PINN}}(x_i) \approx 0
+\quad \Longleftrightarrow \quad
+\int_\Omega \mathcal{R}_{\text{weak}} \, d\Omega = 0
+\]
+
+XPINN partially bridges this gap by enforcing local subdomain consistency,
+which mimics element-wise weak enforcement.
+
+---
+
+\section{Mapping to PyTorch Residuals (Axisymmetric)}
+
+\begin{verbatim}
+# Continuity
+R_cont = (u_r + r*u_r_r)/r + u_z_z
+
+# Radial momentum
+R_ur = u_r*u_r_r + u_z*u_r_z + p_r \
+       - nu*((u_r_r + r*u_r_rr)/r + u_r_zz - u_r/r**2)
+
+# Axial momentum
+R_uz = u_r*u_z_r + u_z*u_z_z + p_z \
+       - nu*((u_z_r + r*u_z_rr)/r + u_z_zz) \
+       - g*beta*(T - T0)
+
+# Energy
+R_T = u_r*T_r + u_z*T_z \
+      - alpha*((T_r + r*T_rr)/r + T_zz)
+\end{verbatim}
+
+---
+
+\section{Remarks}
+
+\begin{itemize}
+\item Axisymmetric geometric terms are essential for physical accuracy
+\item COMSOL weak-form includes the Jacobian factor $r$
+\item PINNs approximate the strong form but converge to the same solution
+\item XPINNs improve conditioning by mimicking FEM locality
+\end{itemize}
+
+
+\section{Conclusion}
+
+The improved SI--LB PINN provides a mathematically well-conditioned framework
+for solving coupled thermal--fluid PDEs in Czochralski crystal growth,
+significantly improving convergence and accuracy over standard PINNs.
+
+\end{document}
+
