@@ -1,0 +1,458 @@
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beamer Presentation
+% LaTeX Template
+% Version 1.0 (10/11/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+
+\documentclass{beamer}
+
+\mode<presentation> {
+
+
+% The Beamer class comes with a number of default slide themes
+% which change the colors and layouts of slides. Below this is a list
+% of all the themes, uncomment each in turn to see what they look like.
+
+%\usetheme{default}
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{Dresden}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+% As well as themes, the Beamer class has a number of color themes
+% for any slide theme. Uncomment each of these in turn to see how it
+% changes the colors of your current slide theme.
+
+%\usecolortheme{albatross}
+%\usecolortheme{beaver}
+%\usecolortheme{beetle}
+%\usecolortheme{crane}
+%\usecolortheme{dolphin}
+%\usecolortheme{dove}
+%\usecolortheme{fly}
+%\usecolortheme{lily}
+%\usecolortheme{orchid}
+%\usecolortheme{rose}
+%\usecolortheme{seagull}
+%\usecolortheme{seahorse}
+%\usecolortheme{whale}
+%\usecolortheme{wolverine}
+
+%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+
+\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage[footnotesize]{subfigure}
+\definecolor{olive}{rgb}{0.3, 0.4, .1}
+\definecolor{fore}{RGB}{249,242,215}
+\definecolor{back}{RGB}{51,51,51}
+\definecolor{title}{RGB}{255,0,90}
+\definecolor{dgreen}{rgb}{0.,0.6,0.}
+\definecolor{gold}{rgb}{1.,0.84,0.}
+\definecolor{Red}{cmyk}{0.99,0,0.52,0}
+\definecolor{Red}{cmyk}{0.85,0,0.33,0}
+\definecolor{RawSienna}{cmyk}{0,0.72,1,0.45}
+\definecolor{Magenta}{cmyk}{0,1,0,0}
+\newcommand{\farbig}[2][red]{\textcolor{#1}{#2}}
+\newcommand{\mysize}[3][1.2]{%
+  \set@fontsize\baselinestretch{#2}{#2}%
+  \set@fontsize{#1}\f@size\f@baselineskip%
+  {\selectfont#3}
+}
+\newcommand{\vect}[1]{\textbf{\textit{#1}}}
+\renewcommand{\vec}[1]{\mbox{\boldmath \small $#1$}}
+\newcommand{\AT}{{\textrm{{AT}}}}
+\newcommand{\EX}{{\textrm{EX}}}
+\newcommand{\CG}{{\textrm{CG}}}
+\newcommand{\HY}{{\Delta}}
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+\title{physics-AI For CFD Simulations: SciML} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author{} % Your name
+
+\date{\today} % Date, can be changed to a custom date
+
+\begin{document}
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline} % Table of contents slide, comment this block out to remove it
+\tableofcontents % Throughout your presentation, if you choose to use \section{} and \section{} commands, these will automatically be printed on this slide as an overview of your presentation
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+
+\subsection{}
+
+
+\begin{frame}
+\frametitle{}
+\begin{itemize}
+ 
+
+\item 
+
+\end{itemize}
+\end{frame}
+
+\section{Adapted PINNs for Crystal Growth}
+\section{PINNs for Cryogenic Systems}
+\section{Dyad Agent Framework}
+
+\subsection{Czochralski Crystal Growth Process}
+
+\begin{frame}{What is the Czochralski (CZ) Process?}
+\begin{itemize}
+\item Dominant method for single-crystal silicon growth
+\item Used in semiconductor and photovoltaic industries
+\end{itemize}
+\end{frame}
+
+\begin{frame}{CZ Furnace Schematic}
+\placeholder{CZ Furnace: Crucible, Melt, Heater, Crystal Pulling}
+\end{frame}
+
+\begin{frame}{Crystal Growth Physics}
+\begin{itemize}
+\item Solidification at melt--crystal interface
+\item Strong heat extraction through crystal
+\item Melt flow affects dopant and defect transport
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why Modeling is Difficult}
+\begin{itemize}
+\item Strong thermal--fluid coupling
+\item High Rayleigh number convection
+\item Thin boundary layers
+\item Multi-physics and multi-scale nature
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Modeling Assumptions and Domain}
+
+\begin{frame}{Axisymmetric Approximation}
+\begin{itemize}
+\item Nearly rotationally symmetric geometry
+\item Reduces 3D problem to 2D $(r,z)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Computational Domain}
+\placeholder{Axisymmetric Melt Domain in $(r,z)$}
+\end{frame}
+
+\begin{frame}{Boundary Identification}
+\placeholder{Crucible Wall, Free Surface, Crystal Interface}
+\end{frame}
+
+\begin{frame}{Physical Assumptions}
+\begin{itemize}
+\item Incompressible Newtonian melt
+\item Laminar, steady-state flow
+\item Constant material properties
+\item Boussinesq approximation
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Governing Equations}
+
+\begin{frame}{Continuity Equation}
+\[
+\frac{1}{r}\frac{\partial}{\partial r}(r u_r)
++ \frac{\partial u_z}{\partial z} = 0
+\]
+\end{frame}
+
+\begin{frame}{Radial Momentum Equation}
+\[
+u_r \partial_r u_r + u_z \partial_z u_r =
+-\frac{1}{\rho}\partial_r p
++ \nu\left(\nabla^2 u_r - \frac{u_r}{r^2}\right)
+\]
+\end{frame}
+
+\begin{frame}{Axial Momentum Equation}
+\[
+u_r \partial_r u_z + u_z \partial_z u_z =
+-\frac{1}{\rho}\partial_z p
++ \nu\nabla^2 u_z
++ g\beta(T-T_0)
+\]
+\end{frame}
+
+\begin{frame}{Energy Equation}
+\[
+u_r \partial_r T + u_z \partial_z T =
+\alpha \nabla^2 T
+\]
+\end{frame}
+
+\begin{frame}{Thermal--Fluid Coupling}
+\begin{itemize}
+\item Temperature $\rightarrow$ buoyancy force
+\item Velocity $\rightarrow$ heat advection
+\item Strong nonlinear feedback loop
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Dimensionless Analysis}
+
+\begin{frame}{Rayleigh Number}
+\[
+\mathrm{Ra} = \frac{g\beta \Delta T L^3}{\nu \alpha}
+\]
+\begin{itemize}
+\item Measures strength of natural convection
+\end{itemize}
+\end{frame}
+
+\begin{frame}{High Rayleigh Number Regime}
+\begin{itemize}
+\item Thin thermal and velocity boundary layers
+\item Strong nonlinear advection
+\item Major source of instability for PINNs
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Improved PINN Methodology}
+
+\begin{frame}{Standard PINN Concept}
+\begin{itemize}
+\item Neural network approximates PDE solution
+\item Physics enforced via residual minimization
+\end{itemize}
+\end{frame}
+
+\begin{frame}{PINN Inputs and Outputs}
+\begin{itemize}
+\item Inputs: $(r,z)$
+\item Outputs: $u_r, u_z, p, T$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Spatial Information (SI) Embedding}
+\begin{itemize}
+\item Coordinates injected into hidden layers
+\item Preserves geometric sensitivity
+\item Improves boundary-layer resolution
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Adaptive Loss Balancing}
+\begin{itemize}
+\item Separate losses for each equation
+\item Trainable weights
+\item Prevents gradient domination
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Equation-to-Loss Function Mapping}
+
+\begin{frame}{PINN Loss Function Structure}
+\[
+\mathcal{L}
+= \lambda_c \mathcal{L}_c
++ \lambda_m \mathcal{L}_m
++ \lambda_e \mathcal{L}_e
++ \lambda_b \mathcal{L}_b
+\]
+\end{frame}
+
+\begin{frame}{Continuity Loss}
+\[
+\mathcal{L}_c =
+\frac{1}{N}\sum_i
+\left|
+\frac{1}{r}\partial_r(r u_r)
++ \partial_z u_z
+\right|^2
+\]
+\end{frame}
+
+\begin{frame}{Momentum Loss}
+\[
+\mathcal{L}_m =
+\|\mathcal{R}_{u_r}\|^2 + \|\mathcal{R}_{u_z}\|^2
+\]
+\begin{itemize}
+\item Enforces Navier--Stokes equations
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Energy Loss}
+\[
+\mathcal{L}_e =
+\frac{1}{N}\sum_i
+\left|
+u_r \partial_r T + u_z \partial_z T - \alpha\nabla^2 T
+\right|^2
+\]
+\end{frame}
+
+\begin{frame}{Boundary Condition Loss}
+\[
+\mathcal{L}_b =
+\|\bm{u}-\bm{u}_{BC}\|^2
++ \|T-T_{BC}\|^2
+\]
+\end{frame}
+
+\begin{frame}{Why Adaptive Weighting Matters}
+\begin{itemize}
+\item Different PDEs have different stiffness
+\item High-Ra momentum residuals dominate gradients
+\item Learned weights improve conditioning
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{XPINN: Domain Decomposition}
+
+\begin{frame}{Motivation for XPINN}
+\begin{itemize}
+\item Global PINNs struggle with large domains
+\item Boundary layers are spatially localized
+\end{itemize}
+\end{frame}
+
+\begin{frame}{XPINN Concept}
+\begin{itemize}
+\item Decompose domain into subdomains
+\item One neural network per subdomain
+\item Interface conditions enforce consistency
+\end{itemize}
+\end{frame}
+
+\begin{frame}{XPINN Domain Decomposition}
+\placeholder{Melt Domain Split into Multiple Subdomains}
+\end{frame}
+
+\begin{frame}{Interface Loss Terms}
+\[
+\mathcal{L}_{\text{int}}
+= \|u^{(1)} - u^{(2)}\|^2
++ \|\nabla u^{(1)} - \nabla u^{(2)}\|^2
+\]
+\end{frame}
+
+\begin{frame}{Why XPINN Improves Stability}
+\begin{itemize}
+\item Localizes stiffness
+\item Reduces spectral bias
+\item Mimics FEM element locality
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Training and Validation}
+
+\begin{frame}{Training Data}
+\begin{itemize}
+\item No experimental or CFD data
+\item Physics-only collocation points
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Reference Solution}
+\begin{itemize}
+\item COMSOL Multiphysics
+\item Weak-form finite element solver
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Velocity Comparison}
+\placeholder{COMSOL vs PINN Velocity Contours}
+\end{frame}
+
+\begin{frame}{Temperature Comparison}
+\placeholder{COMSOL vs PINN Temperature Contours}
+\end{frame}
+
+\begin{frame}{Error Metrics}
+\begin{itemize}
+\item Relative $L_2$ norms
+\item Improved PINN outperforms standard PINN
+\end{itemize}
+\end{frame}
+
+%=====================================================
+\subsection{Conclusions}
+
+\begin{frame}{Key Conclusions}
+\begin{itemize}
+\item Improved PINNs handle thermal--fluid coupling
+\item SI embedding improves spatial accuracy
+\item XPINNs improve stability at high Ra
+\item Results comparable to COMSOL
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Future Work}
+\begin{itemize}
+\item Transient growth
+\item Rotation and Marangoni effects
+\item Real-time process optimization
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\Huge{\centerline{Thank You}}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+\end{document} 
