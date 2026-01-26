@@ -21,7 +21,7 @@
 
 
 % The Beamer class comes with a number of default slide themes
-% which change the colors and layouts of slides. Below this is a list
+% which change the colors and layouts of slides. Below this is a list 
 % of all the themes, uncomment each in turn to see what they look like.
 
 %\usetheme{default}
@@ -121,29 +121,41 @@
 
 \begin{frame}
 \frametitle{Outline} % Table of contents slide, comment this block out to remove it
-\tableofcontents % Throughout your presentation, if you choose to use \section{} and \section{} commands, these will automatically be printed on this slide as an overview of your presentation
+\tableofcontents % Throughout your presentation, if you choose to use \subsection{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
 \end{frame}
 
 %----------------------------------------------------------------------------------------
 %	PRESENTATION SLIDES
 %----------------------------------------------------------------------------------------
 
-\subsection{}
 
+\section{Adapted Physics-Informed Neural Networks for Crystal Growth}
+\section{Modeling of Cryogenic Systems-H2, N2}
+\section{Dyad Agent- Jüiahüb}
+
+\subsection{Cryogenic H2/N2}
 
 \begin{frame}
-\frametitle{}
-\begin{itemize}
- 
-
-\item 
-
-\end{itemize}
+\begin{figure}
+\centering
+%\includegraphics[width=0.5\textwidth]{Images/docker_events.png}
+\includegraphics[width=0.8\textwidth]{cryo_1.jpg}
+\end{figure}
 \end{frame}
 
-\section{Adapted PINNs for Crystal Growth}
-\section{PINNs for Cryogenic Systems}
-\section{Dyad Agent Framework}
+
+\subsection{Dyad agent}
+
+\begin{frame}
+\begin{figure}
+\centering
+%\includegraphics[width=0.5\textwidth]{Images/docker_events.png}
+\includegraphics[width=0.8\textwidth]{Dyad.png}
+\end{figure}
+\end{frame}
+%\subsection{Adapted PINNs for Crystal Growth}
+%\subsection{PINNs for Cryogenic Systems}
+%\subsection{Dyad Agent Framework}
 
 \subsection{Czochralski Crystal Growth Process}
 
@@ -358,42 +370,6 @@ u_r \partial_r T + u_z \partial_z T - \alpha\nabla^2 T
 \end{frame}
 
 %=====================================================
-\subsection{XPINN: Domain Decomposition}
-
-\begin{frame}{Motivation for XPINN}
-\begin{itemize}
-\item Global PINNs struggle with large domains
-\item Boundary layers are spatially localized
-\end{itemize}
-\end{frame}
-
-\begin{frame}{XPINN Concept}
-\begin{itemize}
-\item Decompose domain into subdomains
-\item One neural network per subdomain
-\item Interface conditions enforce consistency
-\end{itemize}
-\end{frame}
-
-\begin{frame}{XPINN Domain Decomposition}
-\placeholder{Melt Domain Split into Multiple Subdomains}
-\end{frame}
-
-\begin{frame}{Interface Loss Terms}
-\[
-\mathcal{L}_{\text{int}}
-= \|u^{(1)} - u^{(2)}\|^2
-+ \|\nabla u^{(1)} - \nabla u^{(2)}\|^2
-\]
-\end{frame}
-
-\begin{frame}{Why XPINN Improves Stability}
-\begin{itemize}
-\item Localizes stiffness
-\item Reduces spectral bias
-\item Mimics FEM element locality
-\end{itemize}
-\end{frame}
 
 %=====================================================
 \subsection{Training and Validation}
@@ -428,18 +404,9 @@ u_r \partial_r T + u_z \partial_z T - \alpha\nabla^2 T
 \end{frame}
 
 %=====================================================
-\subsection{Conclusions}
 
-\begin{frame}{Key Conclusions}
-\begin{itemize}
-\item Improved PINNs handle thermal--fluid coupling
-\item SI embedding improves spatial accuracy
-\item XPINNs improve stability at high Ra
-\item Results comparable to COMSOL
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Future Work}
+\begin{frame}{Work}
 \begin{itemize}
 \item Transient growth
 \item Rotation and Marangoni effects
